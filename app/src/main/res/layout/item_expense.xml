@@ -41,7 +41,7 @@
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_gravity="center_horizontal|center"
-            android:src="@drawable/plus__5"/>
+            android:src="@drawable/plus5"/>
 
     </LinearLayout>
 

@@ -52,7 +52,7 @@
         android:id="@+id/btn_yes1"
         android:layout_width="82dp"
         android:layout_height="45dp"
-        android:background="@color/green"
+        android:background="@color/brand_primary"
         android:src="@drawable/check1"
         android:scaleType="fitCenter"
         app:layout_constraintTop_toBottomOf="@id/editTxt_username"
