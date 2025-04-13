@@ -80,8 +80,8 @@
                 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/linechart"
-                    android:layout_width="380dp"
-                    android:layout_height="280dp"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -115,8 +115,8 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/chartRevenueBox"
-                android:layout_width="317dp"
-                android:layout_height="wrap_content"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
                 android:layout_marginTop="25dp"
                 android:background="@drawable/border_shadow"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -125,16 +125,16 @@
 
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChartRevenue"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ListView
                     android:id="@+id/recentRevenue"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     android:nestedScrollingEnabled="true"
                     app:layout_constraintTop_toBottomOf="@id/pieChartRevenue"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -171,8 +171,8 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/chartExpenseBox"
-                android:layout_width="317dp"
-                android:layout_height="wrap_content"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
                 android:layout_marginTop="25dp"
                 android:background="@drawable/border_shadow"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -181,16 +181,16 @@
 
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChartExpense"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ListView
                     android:id="@+id/recentExpense"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     android:nestedScrollingEnabled="true"
                     app:layout_constraintTop_toBottomOf="@+id/pieChartExpense"
                     app:layout_constraintBottom_toBottomOf="parent"
