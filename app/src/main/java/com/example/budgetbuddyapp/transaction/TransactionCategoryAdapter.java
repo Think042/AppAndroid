@@ -8,20 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.example.budgetbuddyapp.R;
 import com.example.budgetbuddyapp.categories.Category;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 
 public class TransactionCategoryAdapter extends ArrayAdapter<Category> {
-    FirebaseFirestore fStore;
-    FirebaseAuth auth;
     private Activity activity;
     private ArrayList<Category> categoryList;
     private Context context;
@@ -36,14 +29,15 @@ public class TransactionCategoryAdapter extends ArrayAdapter<Category> {
     @NonNull
     @Override
     public View getView(int i, @Nullable View view, @NonNull ViewGroup parent) {
-        if (view == null)
-        {
+        if (view == null) {
             view = LayoutInflater.from(activity).inflate(R.layout.transaction_category_item, null, false);
         }
 
         int[] categoryImages = {R.drawable.food, R.drawable.c_electricitybill, R.drawable.c_fuel, R.drawable.c_clothes,
                 R.drawable.c_bonus, R.drawable.c_shopping, R.drawable.c_book, R.drawable.c_salary, R.drawable.c_wallet,
-                R.drawable.c_phone, R.drawable.c_celebration, R.drawable.c_makeup, R.drawable.c_celebration2, R.drawable.c_basketball, R.drawable.c_gardening};
+                R.drawable.c_phone, R.drawable.c_celebration, R.drawable.c_makeup, R.drawable.c_celebration2,
+                R.drawable.c_basketball, R.drawable.c_gardening};
+
         TextView categoryName = (TextView)view.findViewById(R.id.categoryName);
         ImageView categoryIcon = (ImageView) view.findViewById(R.id.categoryIcon);
         ImageView check = (ImageView) view.findViewById(R.id.check);
@@ -52,7 +46,7 @@ public class TransactionCategoryAdapter extends ArrayAdapter<Category> {
         categoryName.setText(category.getCategoryName());
         categoryIcon.setImageResource(categoryImages[category.getCategoryImage()]);
 
-        // Kiểm tra xem danh mục có được chọn hay không, sau đó cập nhật trạng thái hiển thị của biểu tượng check
+        // Kiểm tra xem danh mục có được chọn hay không
         if (category.isSelected()) {
             check.setVisibility(View.VISIBLE);
         } else {

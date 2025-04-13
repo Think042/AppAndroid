@@ -1,6 +1,5 @@
 package com.example.budgetbuddyapp.Login;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,28 +11,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Bundle;
-
 import com.example.budgetbuddyapp.Navigation;
 import com.example.budgetbuddyapp.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class Login extends AppCompatActivity {
 
-    private FirebaseAuth auth;
     private EditText loginEmail, loginPassword;
     private TextView signupRedirectText, txtview_incorrect, txt_forgotpassword;
     private Button loginButton;
     private CheckBox checkbox;
     public static final String SHARED_PREFS = "sharePrefs";
+
+    // Demo credentials for testing
+    private static final String DEMO_EMAIL = "user@example.com";
+    private static final String DEMO_PASSWORD = "password";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        auth = FirebaseAuth.getInstance();
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.btn_login);
@@ -50,35 +47,28 @@ public class Login extends AppCompatActivity {
 
                 if(!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
-                        auth.signInWithEmailAndPassword(email, pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
+                        // Mock authentication logic
+                        if(email.equals(DEMO_EMAIL) && pass.equals(DEMO_PASSWORD) ||
+                                email.equals("test@gmail.com") && pass.equals("123456")) {
 
-                                        // lưu đăng nhập //auto lưu
-                                        if (checkbox.isChecked()) {
-                                            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-                                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                                            editor.putString("name", "true");
-                                            editor.apply();
-                                        }
+                            // Lưu đăng nhập nếu checkbox được chọn
+                            if (checkbox.isChecked()) {
+                                SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("name", "true");
+                                editor.apply();
+                            }
 
-                                        Toast.makeText(Login.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(Login.this, Navigation.class ));
-                                        finish();
-
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        txtview_incorrect.setVisibility(View.VISIBLE);
-                                        Toast.makeText(Login.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                            Toast.makeText(Login.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(Login.this, Navigation.class));
+                            finish();
+                        } else {
+                            txtview_incorrect.setVisibility(View.VISIBLE);
+                            Toast.makeText(Login.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         loginPassword.setError("Mật khẩu không thể trống");
                     }
-
                 } else if (email.isEmpty()) {
                     loginEmail.setError("Email không thể trống!");
                 } else {
@@ -86,6 +76,7 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
+
         signupRedirectText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

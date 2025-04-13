@@ -1,15 +1,10 @@
 package com.example.budgetbuddyapp;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
-
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,38 +13,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.example.budgetbuddyapp.categories.CategoryHome;
-import com.example.budgetbuddyapp.categories.CategoryViewPagerApdater;
 import com.example.budgetbuddyapp.transaction.HomeTransactionAdapter;
 import com.example.budgetbuddyapp.transaction.RecentTransaction;
 import com.example.budgetbuddyapp.transaction.Transaction;
-import com.example.budgetbuddyapp.transaction.TransactionAdapter;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "HomeFragment";
 
     private String mParam1;
     private String mParam2;
 
     TextView fullName, balance, categoryViewAll, transactionViewAll;
     ImageView hideBalance;
-    FirebaseAuth auth;
-    FirebaseFirestore fStore;
-    String userID;
+    String userID = "user1";
     ArrayList<Transaction> transactionList;
     HomeTransactionAdapter adapter;
     ListView recentTrasactions;
@@ -57,7 +39,8 @@ public class HomeFragment extends Fragment {
     ViewPager2 viewPager;
     ViewPagerAdapter CategoryApdater;
 
-    public static final String SHARED_PREFS = "sharePrefs"; // đăng xuất
+    public static final String SHARED_PREFS = "sharePrefs";
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -96,14 +79,13 @@ public class HomeFragment extends Fragment {
         viewPager = view.findViewById(R.id.viewPager);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         CategoryApdater = new ViewPagerAdapter(fragmentManager, getLifecycle());
-        TextView noItem = (TextView) view.findViewById(R.id.noItem);
+        TextView noItem = view.findViewById(R.id.noItem);
         viewPager.setAdapter(CategoryApdater);
         final boolean[] isPasswordVisible = {false};
 
-        auth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
-
-        userID = auth.getCurrentUser().getUid();
+        // Thiết lập dữ liệu mẫu
+        fullName.setText("Nguyễn Văn A");
+        balance.setText("5,000,000 đ");
 
         tabLayout.addTab(tabLayout.newTab().setText("CHI TIÊU"));
         tabLayout.addTab(tabLayout.newTab().setText("THU NHẬP"));
@@ -115,7 +97,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
             }
 
             @Override
@@ -130,50 +111,25 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        DocumentReference documentReference = fStore.collection("users").document(userID);
-        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e(TAG, "Listen failed: " + error);
-                    return;
-                }
-
-                if (value != null && value.exists()) {
-                    String fullNameText = value.getString("fullname");
-                    Long balanceValue = value.getLong("balance");
-
-                    // Cập nhật giao diện người dùng với dữ liệu mới từ Firestore
-                    fullName.setText(fullNameText != null ? fullNameText : "");
-                    balance.setText(balanceValue != null ? String.format("%,d", balanceValue) + " đ" : "");
-                    Log.d(TAG, "User's balance updated: " +  String.format("%,d", balanceValue));
-                } else {
-                    Log.d(TAG, "No such document");
-                }
-            }
-        });
-
         hideBalance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isPasswordVisible[0]) {
-                    // Nếu password đang hiển thị, chuyển về dạng ẩn
                     balance.setTransformationMethod(PasswordTransformationMethod.getInstance());
                     isPasswordVisible[0] = false;
                 } else {
-                    // Nếu password đang ẩn, chuyển về dạng hiển thị
                     balance.setTransformationMethod(null);
                     isPasswordVisible[0] = true;
                 }
             }
         });
+
         categoryViewAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), CategoryHome.class));
             }
         });
-
 
         transactionViewAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,69 +138,26 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        fStore.collection("transactions")
-                .whereEqualTo("userID", userID)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen failed.", error);
-                            return;
-                        }
+        // Tạo dữ liệu giao dịch mẫu
+        loadMockTransactions();
 
-                        transactionList.clear(); // Xóa dữ liệu cũ trước khi cập nhật mới
+        if (transactionList.isEmpty()) {
+            noItem.setVisibility(View.VISIBLE);
+        } else {
+            noItem.setVisibility(View.GONE);
+        }
 
-                        for (QueryDocumentSnapshot document : value) {
-                            String transactionID = document.getString("transactionId");
-                            String categoryID = document.getString("categoryId");
-                            String note = document.getString("note");
-                            Long amount = document.getLong("amount");
-                            String date = document.getString("date");
-                            String time = document.getString("time");
-                            transactionList.add(new Transaction(transactionID, userID, categoryID, note, date, time, amount));
-                        }
-                        if (transactionList.isEmpty()) {
-                            noItem.setVisibility(View.VISIBLE);
-                        } else
-                        {
-                            noItem.setVisibility(View.GONE);
-                        }
-                        if (adapter == null) {
-                            adapter = new HomeTransactionAdapter(HomeFragment.this, R.layout.transaction_item, transactionList);
-                            recentTrasactions.setAdapter(adapter);
-                        } else {
-                            adapter.notifyDataSetChanged(); // Cập nhật ListView nếu adapter đã được khởi tạo trước đó
-                        }
-                    }
-                });
+        adapter = new HomeTransactionAdapter(this, R.layout.transaction_item, transactionList);
+        recentTrasactions.setAdapter(adapter);
 
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        DocumentReference documentReference = fStore.collection("users").document(userID);
-        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e(TAG, "Listen failed: " + error);
-                    return;
-                }
-                if (value != null && value.exists()) {
-                    String fullNameText = value.getString("fullname");
-                    Long balanceValue = value.getLong("balance");
-
-                    // Cập nhật giao diện người dùng với dữ liệu mới từ Firestore
-                    fullName.setText(fullNameText != null ? fullNameText : "");
-                    balance.setText(balanceValue != null ? String.format("%,d", balanceValue) + " đ": "");
-                    Log.d(TAG, "User's balance updated: " +  String.format("%,d", balanceValue));
-                } else {
-                    Log.d(TAG, "No such document");
-                }
-            }
-        });
+    private void loadMockTransactions() {
+        // Tạo dữ liệu mẫu cho các giao dịch gần đây
+        transactionList.add(new Transaction("1", userID, "cat1", "Ăn trưa", "17-07-2024", "12:30", 150000L));
+        transactionList.add(new Transaction("2", userID, "cat2", "Mua sắm", "16-07-2024", "15:45", 500000L));
+        transactionList.add(new Transaction("3", userID, "cat3", "Tiền lương", "15-07-2024", "08:00", 10000000L));
+        transactionList.add(new Transaction("4", userID, "cat4", "Tiền điện", "14-07-2024", "18:20", 300000L));
     }
 }

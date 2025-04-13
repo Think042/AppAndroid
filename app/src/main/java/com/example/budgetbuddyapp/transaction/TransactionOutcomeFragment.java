@@ -1,39 +1,23 @@
 package com.example.budgetbuddyapp.transaction;
 
-import static android.content.ContentValues.TAG;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.example.budgetbuddyapp.R;
 import com.example.budgetbuddyapp.categories.Category;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 
 public class TransactionOutcomeFragment extends Fragment {
-    FirebaseAuth auth;
-    FirebaseFirestore fStore;
-    String userID;
-    ListView listView;
-    ArrayList<Category> categoryList;
-    TransactionCategoryAdapter adapter;
+    private ListView listView;
+    private ArrayList<Category> categoryList;
+    private TransactionCategoryAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,55 +26,42 @@ public class TransactionOutcomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        auth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
-        userID = auth.getCurrentUser().getUid();
+        super.onViewCreated(view, savedInstanceState);
+
         categoryList = new ArrayList<>();
         listView = (ListView) view.findViewById(R.id.listview);
         TextView noItem = (TextView) view.findViewById(R.id.noItem);
-        int[] categoryImages = {R.drawable.food, R.drawable.c_electricitybill, R.drawable.c_fuel, R.drawable.c_clothes,
-                R.drawable.c_bonus, R.drawable.c_shopping, R.drawable.c_book, R.drawable.c_salary, R.drawable.c_wallet,
-                R.drawable.c_phone, R.drawable.c_celebration, R.drawable.c_makeup, R.drawable.c_celebration2, R.drawable.c_basketball, R.drawable.c_gardening};
 
-        fStore.collection("categories")
-                .whereEqualTo("userID", userID)
-                .whereEqualTo("categoryType", "Chi tiêu") // Lọc dữ liệu theo điều kiện categoryType
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen failed.", error);
-                            return;
-                        }
+        // Thêm các danh mục chi tiêu mẫu
+        categoryList.add(new Category("5", "user1", "Ăn uống", "Chi tiêu", 0, false));
+        categoryList.add(new Category("6", "user1", "Điện nước", "Chi tiêu", 1, false));
+        categoryList.add(new Category("7", "user1", "Xăng dầu", "Chi tiêu", 2, false));
+        categoryList.add(new Category("8", "user1", "Quần áo", "Chi tiêu", 3, false));
+        categoryList.add(new Category("9", "user1", "Mua sắm", "Chi tiêu", 5, false));
 
-                        categoryList.clear(); // Xóa dữ liệu cũ trước khi cập nhật mới
-                        for (QueryDocumentSnapshot document : value) {
-                            String categoryID = document.getId();
-                            String categoryName = document.getString("categoryName");
-                            Number categoryImageIndex = document.getLong("categoryImage");
-                            Boolean isSelected = document.getBoolean("isSelected");
-                            int categoryImage = categoryImageIndex.intValue();
-                            categoryList.add(new Category(categoryID, userID, categoryName, "Thu nhập", categoryImage, isSelected));
-                        }
-                        if (categoryList.isEmpty()) {
-                            noItem.setVisibility(View.VISIBLE);
-                        } else
-                        {
-                            noItem.setVisibility(View.GONE);
-                        }
-                        Log.d(TAG, "Lấy dữ liệu thành công");
-                        if (adapter == null) {
-                            adapter = new TransactionCategoryAdapter(getActivity(), R.layout.transaction_category_item, categoryList, getContext());
-                            listView.setAdapter(adapter);
-                        } else {
-                            adapter.notifyDataSetChanged(); // Cập nhật ListView nếu adapter đã được khởi tạo trước đó
-                        }
-                    }
-                });
+        if (categoryList.isEmpty()) {
+            noItem.setVisibility(View.VISIBLE);
+        } else {
+            noItem.setVisibility(View.GONE);
+        }
+
+        adapter = new TransactionCategoryAdapter(getActivity(), R.layout.transaction_category_item, categoryList, getContext());
+        listView.setAdapter(adapter);
+
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             Category selectedCategory = categoryList.get(position);
+
+            // Đặt tất cả các danh mục khác thành không được chọn
+            for (Category category : categoryList) {
+                category.setSelected(false);
+            }
+
+            // Đặt danh mục được chọn thành true
+            selectedCategory.setSelected(true);
+
             // Cập nhật Adapter để áp dụng thay đổi lên giao diện người dùng
             adapter.notifyDataSetChanged();
+
             // Gửi dữ liệu biểu tượng của danh mục đã chọn về cho ChooseCategoryBottomSheet
             ((ChooseCategoryBottomSheet) getParentFragment()).updateCategory(selectedCategory);
         });

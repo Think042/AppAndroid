@@ -7,28 +7,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.budgetbuddyapp.Login.ForgotPassword;
 import com.example.budgetbuddyapp.Login.Login;
 import com.example.budgetbuddyapp.Profile.ChangePassword;
 import com.example.budgetbuddyapp.Profile.Editprofile;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class ProfileFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -41,9 +30,7 @@ public class ProfileFragment extends Fragment {
     private ConstraintLayout editprofile, changepassword, logout;
     String userID;
     public static final String SHARED_PREFS = "sharePrefs";
-    private FirebaseAuth auth;
-    private FirebaseFirestore fStore;
-    private FirebaseUser user;
+    private static final String USER_DATA_PREFS = "userDataPrefs";
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -79,45 +66,37 @@ public class ProfileFragment extends Fragment {
         txtViewEmail = view.findViewById(R.id.txtViewEmail);
         logout = view.findViewById(R.id.logout);
 
-        auth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
-        userID = auth.getCurrentUser().getUid();
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        // Lấy userID mẫu cho frontend
+        userID = "user123";
 
-        String Email = user.getEmail();
-        txtViewEmail.setText(Email != null ? Email: "");
+        // Đọc thông tin người dùng từ SharedPreferences
+        SharedPreferences userDataPrefs = getActivity().getSharedPreferences(USER_DATA_PREFS, MODE_PRIVATE);
+        String savedName = userDataPrefs.getString("fullname", "Nguyễn Văn A");
+        String savedEmail = userDataPrefs.getString("email", "user@example.com");
 
-        DocumentReference documentReference = fStore.collection("users").document(userID);
+        // Hiển thị thông tin người dùng
+        fullname.setText(savedName);
+        txtViewEmail.setText(savedEmail);
 
-        //Hiển thị tên, email
-        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (value != null && value.exists()) {
-                    String fullNameText = value.getString("fullname");
-                    fullname.setText(fullNameText != null ? fullNameText : "");
-                }
-            }
-        });
-
-        //Sửa thông tin
+        // Sửa thông tin
         editprofile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), Editprofile.class);
+                Intent intent = new Intent(getActivity(), Editprofile.class);
                 startActivity(intent);
             }
         });
 
-        //Đổi mật khẩu
+        // Đổi mật khẩu
         changepassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), ForgotPassword.class));
+                Intent intent = new Intent(getActivity(), ChangePassword.class);
+                startActivity(intent);
             }
         });
 
-        //Đăng xuất
+        // Đăng xuất
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,9 +104,18 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
         return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Cập nhật lại thông tin người dùng khi quay lại từ màn hình sửa
+        SharedPreferences userDataPrefs = getActivity().getSharedPreferences(USER_DATA_PREFS, MODE_PRIVATE);
+        String savedName = userDataPrefs.getString("fullname", "Nguyễn Văn A");
+        fullname.setText(savedName);
+    }
+
     private void showSignOutConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Đăng xuất");
@@ -141,15 +129,14 @@ public class ProfileFragment extends Fragment {
                 editor.putString("name", "");
                 editor.apply();
 
-                FirebaseAuth.getInstance().signOut();
-
                 Intent intent = new Intent(getContext(), Login.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                getActivity().finish();
                 Toast.makeText(getContext(), "Đăng xuất thành công!", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Nếu người dùng không muốn đăng xuất, hoặc hủy bỏ hộp thoại
         builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

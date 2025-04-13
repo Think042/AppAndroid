@@ -1,40 +1,37 @@
 package com.example.budgetbuddyapp.transaction;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.example.budgetbuddyapp.R;
 import com.example.budgetbuddyapp.categories.Category;
 import com.example.budgetbuddyapp.categories.CategoryHome;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class ChooseCategoryBottomSheet extends com.google.android.material.bottomsheet.BottomSheetDialogFragment {
+public class ChooseCategoryBottomSheet extends BottomSheetDialogFragment {
     private ViewPager2 viewPager;
-
     private Category selectedCategory;
+    private TabLayout tabLayout;
+    ImageView categorySettings;
 
     public ChooseCategoryBottomSheet(Category selectedCategory) {
         this.selectedCategory = selectedCategory;
     }
-
-    private TabLayout tabLayout;
-    ImageView categorySettings;
 
     public void updateCategory(Category selectedCategory){
         ((AddNewTransaction) getActivity()).updateCategory(selectedCategory);
         // Đóng bottom sheet sau khi chọn danh mục
         dismiss();
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,12 +56,11 @@ public class ChooseCategoryBottomSheet extends com.google.android.material.botto
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
                     if (position == 0) {
-                        tab.setText("Chi tiêu"); // Đặt tiêu đề cho tab thứ nhất
+                        tab.setText("Chi tiêu");
                     } else {
-                        tab.setText("Thu nhập"); // Đặt tiêu đề cho tab thứ hai
+                        tab.setText("Thu nhập");
                     }
                 }
         ).attach();
     }
-
 }
