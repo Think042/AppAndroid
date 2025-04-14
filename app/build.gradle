@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.budgetbuddyapp'
+    namespace 'com.example.affordly'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.budgetbuddyapp"
+        applicationId "com.example.affordly"
         minSdk 28
         targetSdk 34
         versionCode 1
