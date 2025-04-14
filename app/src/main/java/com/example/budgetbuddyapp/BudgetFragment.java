@@ -47,6 +47,7 @@ public class BudgetFragment extends Fragment {
         // Required empty public constructor
     }
 
+    //Khởi tạo Fragment
     public static BudgetFragment newInstance(String param1, String param2) {
         BudgetFragment fragment = new BudgetFragment();
         Bundle args = new Bundle();
@@ -112,12 +113,14 @@ public class BudgetFragment extends Fragment {
         expenseList.add(new Expense("3", userID, "Tiện ích", 1, "cat3"));
         expenseList.add(new ExpenseProgress("4", userID, "Giải trí", 10, "cat4", currentMonthYear, 500000, 200000));
 
+        // Hiển thị thông báo nếu không có dữ liệu
         if (expenseList.isEmpty()) {
             noExpense.setVisibility(View.VISIBLE);
         } else {
             noExpense.setVisibility(View.GONE);
         }
 
+        // Tạo adapter và gán vào ListView
         ExpenseAdapter = new ExpenseAdapter(view.getContext(), R.layout.item_expense, expenseList);
         expenseListView.setAdapter(ExpenseAdapter);
     }
@@ -131,12 +134,14 @@ public class BudgetFragment extends Fragment {
         goalList.add(new Goal("2", userID, "Du lịch", 2000000L, 10000000L, 12, "30-06-2025"));
         goalList.add(new Goal("3", userID, "Đầu tư", 15000000L, 50000000L, 8, "01-01-2025"));
 
+        // Hiển thị thông báo nếu không có dữ liệu
         if (goalList.isEmpty()) {
             noGoal.setVisibility(View.VISIBLE);
         } else {
             noGoal.setVisibility(View.GONE);
         }
 
+        // Tạo adapter và gán vào ListView
         GoalAdapter = new GoalAdapter(this, R.layout.item_goal, goalList);
         goalListView.setAdapter(GoalAdapter);
     }

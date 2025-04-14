@@ -138,9 +138,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // Tạo dữ liệu giao dịch mẫu
-        loadMockTransactions();
 
+        loadMockTransactions();
+        // Hiển thị danh sách giao dịch
         if (transactionList.isEmpty()) {
             noItem.setVisibility(View.VISIBLE);
         } else {
