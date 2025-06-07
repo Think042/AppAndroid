@@ -1,4 +1,4 @@
-package com.example.budgetbuddyapp.Profile;
+package com.example.affordly.Profile;
 
 import static android.content.ContentValues.TAG;
 
@@ -15,9 +15,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.budgetbuddyapp.Navigation;
-import com.example.budgetbuddyapp.R;
-import com.example.budgetbuddyapp.expense.AddNewExpense;
+import com.example.affordly.Navigation;
+import com.example.affordly.R;
+import com.example.affordly.expense.AddNewExpense;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
